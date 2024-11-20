@@ -1,0 +1,23 @@
+{
+  "name": "docs",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev": "vuepress dev docs",
+    "build": "vuepress build docs",
+    "link:ui": "pnpm link ../ui",
+    "unlink:ui": "pnpm unlink ../ui",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@smallchen/rt-ui": "^1.1.1",
+    "vuepress": "^1.9.10"
+  },
+  "devDependencies": {
+    "webpack": "^4.0.0"
+  }
+}

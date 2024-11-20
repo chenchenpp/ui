@@ -1,0 +1,22 @@
+{
+  "name": "rtUI",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev:docs": "pnpm --filter docs dev",
+    "build:docs": "pnpm --filter docs build",
+    "build:ui": "pnpm --filter @smallchen/rt-ui build",
+    "link:ui": "pnpm --filter docs link:ui",
+    "unlink:ui": "pnpm --filter docs unlink:ui",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "core-js": "^3.8.3",
+    "element-ui": "^2.15.14",
+    "vue": "^2.6.14"
+  }
+}
