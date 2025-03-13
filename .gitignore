@@ -1,10 +1,11 @@
 .DS_Store
 node_modules
-/dist
+
 
 # packages
-packages/*/node_modules
-
+packages/**/node_modules
+packages/docs/**/dist
+packages/ui/**/lib
 # local env files
 .env.local
 .env.*.local

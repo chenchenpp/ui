@@ -79,11 +79,13 @@ export default {
 
         // 插入到最新的位置
         copyAttrOptions.splice(newIndex, 0, curField);
+        if (localStorage) {
+          localStorage.setItem(
+            this.config.selectOptions,
+            JSON.stringify(copyAttrOptions)
+          );
+        }
 
-        localStorage.setItem(
-          this.config.selectOptions,
-          JSON.stringify(copyAttrOptions)
-        );
       }
       this.$emit("dragEnd", { newIndex, oldIndex });
     },

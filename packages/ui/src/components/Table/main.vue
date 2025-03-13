@@ -280,9 +280,9 @@ export default {
           return;
         }
         // 获取默认选中展示的字段
-        const selectOptions = JSON.parse(
+        const selectOptions = localStorage?JSON.parse(
           localStorage.getItem(this.tableDragConfig.selectOptions)
-        );
+        ):[];
         if (selectOptions) {
           this.dragSelectOptions = selectOptions;
           return;
@@ -316,9 +316,9 @@ export default {
           return;
         }
         // 获取默认选中展示的字段
-        const selectedVal = JSON.parse(
+        const selectedVal = localStorage ? JSON.parse(
           localStorage.getItem(this.tableDragConfig.selectedNames)
-        );
+        ) : [];
         if (selectedVal) {
           this.selectedNames = selectedVal;
           return;
@@ -346,9 +346,9 @@ export default {
           );
           return;
         }
-        const tableTemplateData = JSON.parse(
+        const tableTemplateData =localStorage ? JSON.parse(
           localStorage.getItem(this.tableDragConfig.tableName)
-        );
+        ):[];
         // 表格模板
         if (tableTemplateData) {
           this.tableTemplate = tableTemplateData;
@@ -360,15 +360,17 @@ export default {
       this.formatTableHandle();
     },
     setLocalStorage() {
-      localStorage.setItem(
-        this.tableDragConfig.selectedNames,
-        JSON.stringify(this.selectedNames)
-      );
-      // 表格模板
-      localStorage.setItem(
-        this.tableDragConfig.tableName,
-        JSON.stringify(this.tableTemplate)
-      );
+      if(localStorage) {
+        localStorage.setItem(
+          this.tableDragConfig.selectedNames,
+          JSON.stringify(this.selectedNames)
+        );
+        // 表格模板
+        localStorage.setItem(
+          this.tableDragConfig.tableName,
+          JSON.stringify(this.tableTemplate)
+        );
+      }
     },
     // 当拖拽/排序改变时,处理字段
     changeSelected() {
