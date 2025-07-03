@@ -19,7 +19,7 @@ yarn add @smallchen/rt-ui
    import ElementUI from "element-ui";
    import "element-ui/lib/theme-chalk/index.css";
 
-   import RT from "@smallchen/rt-ui";
+   import RtUI from "@smallchen/rt-ui";
    import "@smallchen/rt-ui/lib/index.css";
    Vue.use(RtUI);
    ```
