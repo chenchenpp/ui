@@ -1,0 +1,11 @@
+version: '3.8'
+
+services:
+  vuepress-nginx:
+    build:
+      context: .
+      dockerfile: packages/docs/Dockerfile
+    container_name: rtUI-client
+    restart: always # 挂掉后 重启
+    ports:
+      - "8889:8889"

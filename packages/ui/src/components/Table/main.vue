@@ -209,6 +209,8 @@ export default {
   },
   data() {
     return {
+      // 获取默认选中展示的字段
+      hasLocalStorage: typeof window !== "undefined" && window.localStorage,
       dragSelectOptions: [],
       selectedNames: [],
       tableTemplate: [],
@@ -227,7 +229,7 @@ export default {
   watch: {
     tableList: {
       handler(newVal) {
-        console.log(1111)
+        console.log(1111);
         if (newVal.length) {
           // 如果是拖拽时
           if (this.isTableDrag) {
@@ -275,14 +277,16 @@ export default {
       if (this.tableDragConfig && this.tableDragConfig.isStorage) {
         if (!this.tableDragConfig.selectOptions) {
           console.error(
-            "tableDragConfig中isStorage为true时，需要🈯️定selectOptions"
+            "tableDragConfig中isStorage为true时，需要指定selectOptions"
           );
           return;
         }
-        // 获取默认选中展示的字段
-        const selectOptions = localStorage?JSON.parse(
-          localStorage.getItem(this.tableDragConfig.selectOptions)
-        ):[];
+
+        const selectOptions = this.hasLocalStorage
+          ? JSON.parse(
+              localStorage?.getItem(this.tableDragConfig.selectOptions)
+            )
+          : [];
         if (selectOptions) {
           this.dragSelectOptions = selectOptions;
           return;
@@ -316,9 +320,9 @@ export default {
           return;
         }
         // 获取默认选中展示的字段
-        const selectedVal = localStorage ? JSON.parse(
-          localStorage.getItem(this.tableDragConfig.selectedNames)
-        ) : [];
+        const selectedVal = this.hasLocalStorage
+          ? JSON.parse(localStorage.getItem(this.tableDragConfig.selectedNames))
+          : [];
         if (selectedVal) {
           this.selectedNames = selectedVal;
           return;
@@ -346,9 +350,9 @@ export default {
           );
           return;
         }
-        const tableTemplateData =localStorage ? JSON.parse(
-          localStorage.getItem(this.tableDragConfig.tableName)
-        ):[];
+        const tableTemplateData = this.hasLocalStorage
+          ? JSON.parse(localStorage.getItem(this.tableDragConfig.tableName))
+          : [];
         // 表格模板
         if (tableTemplateData) {
           this.tableTemplate = tableTemplateData;
@@ -360,7 +364,7 @@ export default {
       this.formatTableHandle();
     },
     setLocalStorage() {
-      if(localStorage) {
+      if (this.hasLocalStorage) {
         localStorage.setItem(
           this.tableDragConfig.selectedNames,
           JSON.stringify(this.selectedNames)

@@ -1,11 +1,11 @@
 import ElementUI from "element-ui";
-// 组件引入
-// import RtUI from "../../../ui/src/index"
-// import RtUI from '../../lib/index'
-import RtUI from "@smallchen/rt-ui"
+// 本地调试引入
+import RtUI from "@smallchen/rt-ui/src/index"
+// 打包后引入
+// import RtUI from "@smallchen/rt-ui"
 import "element-ui/lib/theme-chalk/index.css";
-import "@smallchen/rt-ui/lib/index.css"
-console.log(process.env.NODE_ENV, 'process.env.NODE_ENV')
+// 打包后引入
+// import "@smallchen/rt-ui/lib/index.css"
 export default ({
   Vue
 }) => {
