@@ -5,7 +5,7 @@ node_modules
 # packages
 packages/**/node_modules
 packages/docs/**/dist
-packages/ui/**/lib
+packages/ui/lib
 # local env files
 .env.local
 .env.*.local

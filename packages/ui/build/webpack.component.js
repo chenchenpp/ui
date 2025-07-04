@@ -7,7 +7,8 @@ const { VueLoaderPlugin } = require("vue-loader");
 // 分离css
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 // 合并css
-const OptimizeCSSAssetsPlugin = require("optimize-css-assets-webpack-plugin");
+const CssMinimizerPlugin = require("css-minimizer-webpack-plugin");
+
 // 压缩文件
 const TerserPlugin = require("terser-webpack-plugin");
 // 清空构建文件
@@ -51,7 +52,6 @@ module.exports = {
       {
         test: /\.js$/,
         loader: "babel-loader",
-        exclude: /node_modules/,
       },
       {
         test: /\.vue$/,
@@ -97,6 +97,6 @@ module.exports = {
   ],
   optimization: {
     minimize: true,
-    minimizer: [new TerserPlugin(), new OptimizeCSSAssetsPlugin({})],
+    minimizer: [new TerserPlugin(), new CssMinimizerPlugin()],
   },
 };

@@ -1,10 +1,14 @@
 {
   "name": "@smallchen/rt-ui",
-  "version": "0.1.1",
+  "version": "0.2.5",
   "description": "大润发业务组件",
   "author": "peng.chen",
   "main": "lib/index.js",
   "private": false,
+  "files": [
+    "lib",
+    "README.md"
+  ],
   "scripts": {
     "build": "webpack --config ./build/webpack.component.js",
     "lint": "vue-cli-service lint"
@@ -17,18 +21,20 @@
   "devDependencies": {
     "@babel/core": "^7.12.16",
     "@babel/eslint-parser": "^7.12.16",
+    "@babel/preset-env": "^7.28.0",
     "@vue/cli-plugin-babel": "~5.0.0",
     "@vue/cli-plugin-eslint": "~5.0.0",
     "@vue/cli-service": "~5.0.0",
     "babel-loader": "^8.3.0",
     "clean-webpack-plugin": "^4.0.0",
     "css-loader": "^7.1.1",
+    "css-minimizer-webpack-plugin": "^7.0.2",
     "eslint": "^7.32.0",
     "eslint-plugin-vue": "^8.0.3",
     "html-entities": "~1.4.0",
     "lodash": "^4.17.21",
     "mini-css-extract-plugin": "^2.7.6",
-    "optimize-css-assets-webpack-plugin": "^6.0.1",
+    "sass": "^1.89.2",
     "sass-loader": "^8.0.2",
     "terser-webpack-plugin": "^5.3.10",
     "vue-loader": "15.9.8",
@@ -51,10 +57,5 @@
       "requireConfigFile": false
     },
     "rules": {}
-  },
-  "browserslist": [
-    "> 1%",
-    "last 2 versions",
-    "not dead"
-  ]
+  }
 }

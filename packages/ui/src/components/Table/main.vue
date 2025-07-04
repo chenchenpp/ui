@@ -13,7 +13,38 @@
         ></rt-drag-select>
       </div>
     </div>
-    <el-table :data="formData.data" v-bind="$attrs" v-on="$listeners">
+    <el-table
+      :data="formData.data"
+      v-bind="$attrs"
+      v-on="$listeners"
+      :ref="tableRef"
+      @selection-change="onSelectedTableChange"
+      @select-all="onCheckedPageAll"
+      @select="selectOne"
+    >
+      <template v-if="isAllSelected">
+        <el-table-column label="" align="center" width="80">
+          <template slot="header">
+            <el-checkbox
+              class="rt-table-check__all"
+              v-model="allChecked"
+              :indeterminate="allCheckedIndeterminate"
+              :disabled="!formData.data.length"
+              @change="onAllCheckedTable"
+              >全选所有</el-checkbox
+            >
+          </template>
+          <template slot-scope="scope">
+            {{ scope.$index + 1 }}
+          </template>
+        </el-table-column>
+        <el-table-column
+          type="selection"
+          width="80"
+          reserve-selection
+          label-class-name="rt-table-check__page"
+        ></el-table-column>
+      </template>
       <slot name="left"></slot>
       <template v-for="tableColum in tableTemplate">
         <!-- 多表头 -->
@@ -188,6 +219,11 @@ export default {
     data: {
       type: Array,
     },
+    tableRef: {
+      type: String,
+      default: "",
+    },
+    // 表头
     tableList: {
       type: Array,
     },
@@ -206,6 +242,34 @@ export default {
         noDataFormat: "-",
       }),
     },
+    // 是否需要表格全选功能
+    isAllSelected: {
+      type: Boolean,
+      default: false,
+    },
+    // 是否全选整个表格
+    allTableChecked: {
+      type: Boolean,
+      default: false,
+    },
+    // 全选的情况下，取消表格选中行
+    cancelSelectedTableRow: {
+      type: Array,
+      default: () => [],
+    },
+    selectedTableRow: {
+      type: Array,
+      default: () => [],
+    },
+    // 表格选中行的唯一key名，用于匹配
+    selectedKeyName: {
+      type: String,
+    },
+    // 表格总数量
+    tableTotal: {
+      type: Number,
+      default: 0,
+    },
   },
   data() {
     return {
@@ -214,12 +278,39 @@ export default {
       dragSelectOptions: [],
       selectedNames: [],
       tableTemplate: [],
+      allCheckedIndeterminate: false,
     };
   },
   components: {
     RtDragSelect,
   },
   computed: {
+    allChecked: {
+      get() {
+        return this.allTableChecked;
+      },
+      set(value) {
+        this.$emit("update:allTableChecked", value);
+      },
+    },
+    // 取消选中行
+    cancelRow: {
+      get() {
+        return this.cancelSelectedTableRow;
+      },
+      set(value) {
+        this.$emit("update:cancelSelectedTableRow", value);
+      },
+    },
+    // 存储选中行
+    selectedRow: {
+      get() {
+        return this.selectedTableRow;
+      },
+      set(value) {
+        this.$emit("update:selectedTableRow", value);
+      },
+    },
     formData() {
       return {
         data: this.data,
@@ -229,7 +320,6 @@ export default {
   watch: {
     tableList: {
       handler(newVal) {
-        console.log(1111);
         if (newVal.length) {
           // 如果是拖拽时
           if (this.isTableDrag) {
@@ -247,6 +337,62 @@ export default {
       },
       deep: true,
       immediate: true,
+    },
+    data: {
+      handler(value) {
+        // 是否全选
+        if (this.allChecked) {
+          let that = this;
+          value.forEach((row) => {
+            const hasSelected = that.cancelRow.some(
+              (item) => item[this.selectedKeyName] === row[this.selectedKeyName]
+            );
+            // 如果不在取消选中时，则自动选中
+            if (!hasSelected) {
+              this.$nextTick(() => {
+                that.$refs.searchTableRef.toggleRowSelection(row, true);
+              });
+            }
+          });
+        }
+      },
+      deep: true,
+    },
+    //排除的选项
+    cancelRow: {
+      handler(value) {
+        // 取消选中 = 总条数， 取消全选表格按钮
+        if (value.length === this.tableTotal) {
+          this.allChecked = false;
+          this.allCheckedIndeterminate = false;
+        }
+        if (value.length === 0) {
+          this.allChecked = true;
+          this.allCheckedIndeterminate = false;
+        }
+      },
+      deep: true,
+    },
+    //选中的选项  allCheck 为false时 此选项才数据才是真实的
+    selectedRow: {
+      handler(value) {
+        if (!this.allChecked) {
+          //如果选中数量等于总数  排除项设置为 空数组   自动触发 全选设置为 true
+          if (value.length === this.tableTotal) {
+            this.cancelRow = [];
+          }
+          //如果选中数量为 空
+          if (value.length === 0) {
+            this.allCheckedIndeterminate = false;
+          }
+
+          //如果选中数量大于0 小于总数  设置样式为横杠
+          if (value.length < this.tableTotal && value.length > 0) {
+            this.allCheckedIndeterminate = true;
+          }
+        }
+      },
+      deep: true,
     },
   },
   methods: {
@@ -431,10 +577,104 @@ export default {
         (item) => item.value === rowData[tableColum.prop]
       ).label;
     },
+    /**
+     * 表格全选处理
+     */
+    onAllCheckedTable() {
+      this.$nextTick(() => {
+        if (this.allChecked) {
+          //全选的时候把 排除项 设置为 空数组
+          this.cancelRow = [];
+          this.formData.data.forEach((row) => {
+            this.$refs[this.tableRef].toggleRowSelection(row, true);
+          });
+        } else {
+          this.selectedRow = [];
+          this.$refs[this.tableRef].clearSelection();
+        }
+      });
+    },
+    //当选择项发生变化时会触发该事件
+    onSelectedTableChange(rows) {
+      if (this.isAllSelected) {
+        this.selectedRow = rows;
+      }
+      this.$emit("selectionChange", rows);
+    },
+    onCheckedPageAll(rows) {
+      if (this.isAllSelected) {
+        if (this.allChecked) {
+          let that = this;
+          that.allCheckedIndeterminate = true;
+          let curTableLength = that.formData.data.length;
+          // 判断勾选全选本页是选中还是取消
+          if (rows.indexOf(that.formData.data[0]) !== -1) {
+            // 选中
+            for (let i = 0; i < curTableLength; i++) {
+              for (let n = 0; n < that.cancelRow.length; n++) {
+                if (
+                  that.cancelRow[n][this.selectedKeyName] ===
+                  that.formData.data[i][this.selectedKeyName]
+                ) {
+                  that.cancelRow.splice(n, 1);
+                }
+              }
+            }
+          } else {
+            // 取消
+            for (let j = 0; j < curTableLength; j++) {
+              if (that.cancelRow.length !== 0) {
+                if (that.cancelRow.indexOf(that.formData.data[j]) === -1) {
+                  that.cancelRow.push(that.formData.data[j]);
+                }
+              } else {
+                that.cancelRow.push(that.formData.data[j]);
+              }
+            }
+          }
+        }
+      }
+      this.$emit("selectAll", rows);
+    },
+    //判断选中状态
+    judgeFunc(rows, row) {
+      // 多选框样式改变
+      this.allCheckedIndeterminate = true;
+      // 判断勾选数据行是选中还是取消
+      let selected = rows.length && rows.indexOf(row) !== -1;
+      let lenFalse = this.cancelRow.length;
+      if (selected) {
+        // 选中
+        if (lenFalse !== 0) {
+          for (let i = 0; i < lenFalse; i++) {
+            if (
+              this.cancelRow[i][this.selectedKeyName] ===
+              row[this.selectedKeyName]
+            ) {
+              this.cancelRow.splice(i, 1);
+              break;
+            }
+          }
+        }
+      } else {
+        // 取消
+        this.cancelRow.push(row);
+      }
+    },
+    selectOne(rows, row) {
+      if (this.isAllSelected) {
+        if (this.allChecked) {
+          this.judgeFunc(rows, row);
+        } else {
+          this.allCheckedIndeterminate = true;
+        }
+      }
+      this.$emit('select', rows, row)
+    },
   },
 };
 </script>
-<style>
+<style lang="scss">
 .rt-table-header {
   display: flex;
   align-items: center;
@@ -448,5 +688,29 @@ export default {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+.rt-table-check__all {
+  .el-checkbox__label {
+    width: 30px;
+    white-space: break-spaces;
+    padding-left: 4px;
+    font-size: 12px;
+    line-height: 14px;
+  }
+}
+.rt-table-check__page {
+  .el-checkbox {
+    position: relative;
+    display: flex;
+    align-items: flex-end;
+    &::after {
+      content: "本页全选";
+      width: 30px;
+      white-space: break-spaces;
+      font-size: 12px;
+      line-height: 14px;
+      padding-left: 4px;
+    }
+  }
 }
 </style>
